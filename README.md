@@ -4,7 +4,7 @@ Ushahidi Coding Challenge
 This project maps data from NGO project in Kenya. All data is clustered. Individual markers display project title, description, and objectives.
 Uses leaflet.js and vanilla javascript.
 
-To run: simply open index.html in the browser.
+To run: Download repo and simply open index.html in the browser.
 
 Approach:
 I chose leaflet.js because it was simple to interact with the data on the frontend, rather than using mapbox gl js which would have required 
