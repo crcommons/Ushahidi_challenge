@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.legend {
+  width: 100px;
+  background-color: white;
+  padding: 1em;
+  border-radius: 10px;
+  border: 4px solid #160016;
+  margin-bottom: 2em !important;
+}
+
+.colorKey {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  opacity: .7;
+}
+
+.count {
+  display: inline-block;
+  margin-left: 5px;
+}
