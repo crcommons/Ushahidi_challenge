@@ -71,8 +71,9 @@ countCounties(feature);
 var setSelectOptions = function(){
 	if(firstLoad === true){
 	var keys = Object.keys(constituency);
+	console.log(keys)
 		for(var i = 0; i < keys.length; i++){
-			$('#filters').append('<option value=' + keys[i] + '>' + keys[i] + '</option>')
+			$('#filters').append('<option value=\"' + keys[i] + '\">' + keys[i] + '</option>')
 		}
 	}
 	firstLoad = false
@@ -151,6 +152,7 @@ $('.uncluster').on('click', function(){
 //THAT MATCHES THE FILTER VALUE
 $('#filterBtn').on('click', function(){
 	var filter = $('#filters').val()
+	console.log(filter)
 	
 	if(filter != 'select'){
 		var newData = {"type":"FeatureCollection", "features":[]}
