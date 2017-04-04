@@ -12,22 +12,32 @@
   <script src="data.geojson"></script>
   <script src="counties.geojson"></script>
   <link href='styles.css' rel='stylesheet' />
-</head>
+  <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script></head>
 <body>
 <div id='map' class='map'> 
 <div class="leaflet-bottom leaflet-right">
   <div class="leaflet-control legend">
+  <button class="cluster">Cluster</button>
+  <button class="uncluster">Uncluster</button>
+  <hr>
+  <select id="filters"><option value="select">Select Constituency</option></select>
+  <button id="filterBtn">Filter by Constituency</button>
+  <button id="unfilterBtn">Remove Filter</button>
+  <hr>
   <h3>Projects per County</h3>
-    <div class="colorKey" style="background:#160016"></div><div class="count">100+</div>
-    <div class="colorKey" style="background:#380036 "></div><div class="count">76-100</div>
-    <div class="colorKey" style="background:#4d004b "></div><div class="count">51-75</div>
-    <div class="colorKey" style="background:#810f7c "></div><div class="count">41-50</div>
-    <div class="colorKey" style="background:#88419d "></div><div class="count">31-40</div>
-    <div class="colorKey" style="background:#8c6bb1 "></div><div class="count">26-30</div>
-    <div class="colorKey" style="background:#8c96c6 "></div><div class="count">21-25</div>
-    <div class="colorKey" style="background:#9ebcda "></div><div class="count">16-20</div>
-    <div class="colorKey" style="background:#bfd3e6 "></div><div class="count">11-15</div>
-    <div class="colorKey" style="background:#e0ecf4 "></div><div class="count">6-10</div>
+    <div class="colorKey filter" style="background:#160016"></div><div class="count">100+</div><br>
+    <div class="colorKey" style="background:#380036 "></div><div class="count">76-100</div><br>
+    <div class="colorKey" style="background:#4d004b "></div><div class="count">51-75</div><br>
+    <div class="colorKey" style="background:#810f7c "></div><div class="count">41-50</div><br>
+    <div class="colorKey" style="background:#88419d "></div><div class="count">31-40</div><br>
+    <div class="colorKey" style="background:#8c6bb1 "></div><div class="count">26-30</div><br>
+    <div class="colorKey" style="background:#8c96c6 "></div><div class="count">21-25</div><br>
+    <div class="colorKey" style="background:#9ebcda "></div><div class="count">16-20</div><br>
+    <div class="colorKey" style="background:#bfd3e6 "></div><div class="count">11-15</div><br>
+    <div class="colorKey" style="background:#e0ecf4 "></div><div class="count">6-10</div><br>
     <div class="colorKey" style="background:#f7fcfd "></div><div class="count">1-5</div>
   </div>
 </div>

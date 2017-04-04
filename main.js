@@ -1,17 +1,15 @@
-var tiles = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY3Jjb21tb25zIiwiYSI6ImNqMHkyMTl5azAxZGwzMnJ0dnhzdDB0MnIifQ.B8LBIXcAON9g-uMk1XiIdw', {
-  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-  maxZoom: 18,
-  id: 'mapbox.streets',
-  accessToken: 'pk.eyJ1IjoiY3Jjb21tb25zIiwiYSI6ImNqMHkyMTl5azAxZGwzMnJ0dnhzdDB0MnIifQ.B8LBIXcAON9g-uMk1XiIdw'
-})
+//~~~~~~~~~GLOBAL VARIABLES~~~~~~~~~~
 
-//CREATING A NEW MAP INSTANCE
-var map = L.map('map')
-  .setView([0.211433999999997, 35.395105], 7)
-  .addLayer(tiles);
+var ngoCounties = {}; //COUNT OF PROJECTS BY COUNTY
+var constituency = {}; //LIST OF CONSTITUENCIES IN DATA
+var firstLoad = true; //TELLS IF PAGE IS BEING LOADED
+var clustered = true; //IS CLUSTERING ON OR OFF
+var filteredLayer = undefined; //HOLDS FILTERED DATA FOR ADDING TO MAP
+var filtering = false; //IS DATA BEING FILTERED
 
-//OBJECT TO HOLD LIST/COUNT OF COUNTIES
-var ngoCounties = {};
+
+//~~~~~~~~~~~~FUNCTIONS FOR ITERATING THROUGH & FILTERING DATA, CHOROPLETH~~~~~~~~~~~~~~
+
 //CHECK EACH COUNTY AND ADD IT TO NGOCOUNTIES OBJECT
 var countCounties = function(feature){
 	var county = feature.properties.county
@@ -47,12 +45,37 @@ var setPopupContent = function(feature, layer){
 	layer.bindPopup(content);
 }
 
+//CREATE A STORAGE OBJECT TO LIST EACH CONSTITUENCY IN DATA SET
+var countConstituencies = function (feature){
+	var constit = feature.properties.constituency
+
+	if (constituency[constit]) {
+		constituency[constit] = constituency[constit] + 1
+	} else {
+		constituency[constit] = 1
+	}
+}
+
 //FOR EACH NGO PROJECT
 //RUN COUNTCOUNTIES AND SETPOPUPCONENT 
 //WHEN ADDING THEM TO MAP LAYER
 var onEachFeature = function(feature, layer) {
-	countCounties(feature);
+countCounties(feature);
 	setPopupContent(feature, layer);
+	if(firstLoad === true){
+		countConstituencies(feature);
+	}
+}
+
+//CREATES A HTML SELECT OPTION FOR EACH CONSTITUENCY
+var setSelectOptions = function(){
+	if(firstLoad === true){
+	var keys = Object.keys(constituency);
+		for(var i = 0; i < keys.length; i++){
+			$('#filters').append('<option value=' + keys[i] + '>' + keys[i] + '</option>')
+		}
+	}
+	firstLoad = false
 }
 
 //TAKES THE NUMBER OF PROJECTS IN ONE COUNTY AND RETURNS A COLOR
@@ -93,13 +116,103 @@ var style = function(feature) {
   };
 }
 
+
+//~~~~~~~~~JQUERY UI FUNCTIONS~~~~~~~~~~~
+
+//TURNS ON CLUSTERING	
+$('.cluster').on('click', function(){
+	if (clustered === false){
+		//REMOVES FILTERED LAYER IF FILTERING IS ON
+		if(filtering === true){
+			map.removeLayer(filteredLayer)
+		}
+		map.removeLayer(geoJsonLayer)
+		map.addLayer(markers);
+		map.fitBounds(markers.getBounds());
+		clustered = true;
+		filtering = false;
+	}
+})
+
+//TURNS OFF CLUSTERING
+$('.uncluster').on('click', function(){
+	if(filtering === true) {
+		map.removeLayer(filteredLayer)
+	}
+	if(clustered === true || filtering === true){
+		map.removeLayer(markers)
+		map.addLayer(geoJsonLayer)
+		clustered = false;
+		filtering = false;
+	}
+})
+
+//ITERATES THROUGH DATA SET AND RETURNS EACH FEATURE
+//THAT MATCHES THE FILTER VALUE
+$('#filterBtn').on('click', function(){
+	var filter = $('#filters').val()
+	
+	if(filter != 'select'){
+		var newData = {"type":"FeatureCollection", "features":[]}
+		
+		//ITERATE THROUGH DATA TO MATCH FILTER VALUE
+		for(var i = 0; i < data.features.length; i++){
+			if (data.features[i].properties.constituency === filter){
+				newData.features.push(data.features[i])
+			}
+		}
+
+		//REMOVING EXISTING LAYERS
+		if(clustered === true){
+			map.removeLayer(markers)
+		} else if (clustered === false) {
+			map.removeLayer(geoJsonLayer)
+		}
+		if(filteredLayer != undefined){
+			map.removeLayer(filteredLayer)
+		}
+
+		//CREATE AND ADD NEW LATER WITH FILTERED DATA
+		filteredLayer = L.geoJSON(newData, {onEachFeature: onEachFeature})
+		map.addLayer(filteredLayer)
+		clustered = false;
+		filtering = true;
+	}
+})
+
+//REMOVES FILTER AND DISPLAYS ALL UNCLUSTERED DATA
+$('#unfilterBtn').on('click', function(){
+	if(filtering === true) {
+		map.addLayer(geoJsonLayer)
+		filtering = false;
+	}
+})
+
+
+
+//~~~~~~~~~~BUILDING THE MAP, ETC~~~~~~~~~~~~~~
+
+var tiles = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY3Jjb21tb25zIiwiYSI6ImNqMHkyMTl5azAxZGwzMnJ0dnhzdDB0MnIifQ.B8LBIXcAON9g-uMk1XiIdw', {
+  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+  maxZoom: 18,
+  id: 'mapbox.streets',
+  accessToken: 'pk.eyJ1IjoiY3Jjb21tb25zIiwiYSI6ImNqMHkyMTl5azAxZGwzMnJ0dnhzdDB0MnIifQ.B8LBIXcAON9g-uMk1XiIdw'
+})
+
+//CREATING A NEW MAP INSTANCE
+var map = L.map('map')
+  .setView([0.211433999999997, 35.395105], 7)
+  .addLayer(tiles);
+
 //CREATE CLUSTER
 var markers = L.markerClusterGroup();
 
 //CREATE POINTS
 var geoJsonLayer = L.geoJSON(data, {onEachFeature: onEachFeature})
 
-//ADD POINT TO MAP
+setSelectOptions()
+
+//ADD COUNTY OUTLINES TO MAP
 L.geoJson(counties, {style: style}).addTo(map);
 
 //ADD POINT LAYER TO CLUSTER
@@ -108,6 +221,5 @@ markers.addLayer(geoJsonLayer);
 //ADD CLUSTER LAYER
 map.addLayer(markers);
 map.fitBounds(markers.getBounds());
-
 
  map.scrollWheelZoom.disable();
